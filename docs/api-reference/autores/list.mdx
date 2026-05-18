@@ -1,0 +1,95 @@
+---
+title: "Listar autores"
+description: "Devuelve todos los autores registrados, ordenados por id ascendente."
+openapi: "GET /autores"
+---
+
+Recupera la lista completa de autores. No acepta parámetros de filtrado ni paginación: siempre retorna todos los registros ordenados por `id` ascendente.
+
+## Parámetros
+
+Este endpoint **no recibe** parámetros de path, query ni body.
+
+## Ejemplos de request
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET http://localhost:4040/autores \
+  -H "Accept: application/json"
+```
+
+```javascript fetch
+const res = await fetch("http://localhost:4040/autores", {
+  headers: { Accept: "application/json" },
+});
+const json = await res.json();
+console.log(json.data);
+```
+
+</CodeGroup>
+
+## Respuesta exitosa
+
+<ResponseField name="success" type="boolean" required>
+  Siempre `true` en respuestas exitosas.
+</ResponseField>
+
+<ResponseField name="data" type="Autor[]" required>
+  Array de autores. Cada elemento tiene la siguiente forma:
+
+  <Expandable title="Estructura de Autor">
+    <ResponseField name="id" type="integer">
+      Identificador único del autor.
+    </ResponseField>
+    <ResponseField name="nombre" type="string">
+      Nombre completo del autor.
+    </ResponseField>
+    <ResponseField name="biografia" type="string | null">
+      Biografía corta. Puede ser `null`.
+    </ResponseField>
+    <ResponseField name="created_at" type="string (ISO 8601)">
+      Fecha de creación del registro.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "nombre": "Gabriel Garcia Marquez",
+      "biografia": "Novelista y periodista colombiano.",
+      "created_at": "2026-05-09T18:00:00.000Z"
+    },
+    {
+      "id": 2,
+      "nombre": "Isaac Asimov",
+      "biografia": "Escritor y bioquimico, referente de la ciencia ficcion.",
+      "created_at": "2026-05-09T18:00:00.000Z"
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Errores posibles
+
+| Status | `error.code`          | Descripción                                       |
+| ------ | --------------------- | ------------------------------------------------- |
+| 500    | `AUTORES_LIST_ERROR`  | Error interno al consultar la base de datos.      |
+
+```json 500 Internal Server Error
+{
+  "success": false,
+  "error": {
+    "code": "AUTORES_LIST_ERROR",
+    "message": "Error al listar autores"
+  }
+}
+```

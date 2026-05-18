@@ -1,0 +1,72 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "Librería API",
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#0F766E",
+    "light": "#14B8A6",
+    "dark": "#115E59",
+    "background": {
+      "light": "#FFFFFF",
+      "dark": "#0B1F1D"
+    },
+    "anchors": {
+      "from": "#0F766E",
+      "to": "#14B8A6"
+    }
+  },
+  "openapi": ["openapi.json"],
+  "api": {
+    "baseUrl": [
+      "http://localhost:4040",
+      "https://placeholder.trycloudflare.com"
+    ],
+    "playground": {
+      "mode": "show",
+      "disableProxy": true
+    },
+    "request": {
+      "example": {
+        "languages": ["curl", "javascript", "python"]
+      }
+    }
+  },
+  "topbarLinks": [
+    {
+      "name": "Health",
+      "url": "http://localhost:4040/health"
+    },
+    {
+      "name": "Swagger UI",
+      "url": "http://localhost:4040/api-docs"
+    }
+  ],
+  "topbarCtaButton": {
+    "name": "API Base URL",
+    "url": "http://localhost:4040"
+  },
+  "navigation": [
+    {
+      "group": "Inicio",
+      "pages": [
+        "introduction",
+        "quickstart"
+      ]
+    },
+    {
+      "group": "Guías",
+      "pages": [
+        "models",
+        "errores",
+        "docker"
+      ]
+    },
+    {
+      "group": "API Reference",
+      "pages": [
+        "api-reference/autores/list",
+        "api-reference/libros/list"
+      ]
+    }
+  ]
+}

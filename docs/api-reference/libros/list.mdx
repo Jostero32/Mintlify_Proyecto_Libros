@@ -1,0 +1,138 @@
+---
+title: "Listar libros"
+description: "Lista todos los libros con su autor, opcionalmente filtrado por género."
+openapi: "GET /libros"
+---
+
+Devuelve todos los libros del catálogo. Cada libro viene con un objeto `autor` anidado (id + nombre). Opcionalmente puedes filtrar por género con un query param.
+
+<Tip>
+  El filtro por género es **case-insensitive** (usa `ILIKE` de PostgreSQL), pero debe coincidir exactamente con el valor — no aplica wildcards.
+</Tip>
+
+## Query params
+
+<ParamField query="genero" type="string">
+  Filtra los libros por género (match exacto, case-insensitive). Si se omite, devuelve todos los libros. Valores válidos típicos del seed: `ficcion`, `historia`, `tecnologia`, `ciencia ficcion`, etc.
+</ParamField>
+
+## Ejemplos de request
+
+<CodeGroup>
+
+```bash cURL (todos)
+curl -X GET http://localhost:4040/libros \
+  -H "Accept: application/json"
+```
+
+```bash cURL (filtrado)
+curl -X GET "http://localhost:4040/libros?genero=ficcion" \
+  -H "Accept: application/json"
+```
+
+```javascript fetch
+const params = new URLSearchParams({ genero: "ficcion" });
+const res = await fetch(`http://localhost:4040/libros?${params}`, {
+  headers: { Accept: "application/json" },
+});
+const json = await res.json();
+console.log(json.data);
+```
+
+</CodeGroup>
+
+## Respuesta exitosa
+
+<ResponseField name="success" type="boolean" required>
+  Siempre `true` en respuestas exitosas.
+</ResponseField>
+
+<ResponseField name="data" type="Libro[]" required>
+  Array de libros ordenados por `id` ascendente.
+
+  <Expandable title="Estructura de Libro">
+    <ResponseField name="id" type="integer">
+      Identificador único del libro.
+    </ResponseField>
+    <ResponseField name="titulo" type="string">
+      Título del libro.
+    </ResponseField>
+    <ResponseField name="isbn" type="string">
+      ISBN único en el catálogo.
+    </ResponseField>
+    <ResponseField name="genero" type="string">
+      Género literario.
+    </ResponseField>
+    <ResponseField name="anio_publicacion" type="integer | null">
+      Año de publicación. Puede ser `null`.
+    </ResponseField>
+    <ResponseField name="autor_id" type="integer">
+      FK al autor (`autores.id`).
+    </ResponseField>
+    <ResponseField name="created_at" type="string (ISO 8601)">
+      Fecha de creación del registro.
+    </ResponseField>
+    <ResponseField name="autor" type="object">
+      Datos básicos del autor (id + nombre).
+
+      <Expandable title="Estructura de autor anidado">
+        <ResponseField name="id" type="integer" />
+        <ResponseField name="nombre" type="string" />
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseExample>
+
+```json 200 OK
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "titulo": "Cien anos de soledad",
+      "isbn": "9780307474728",
+      "genero": "ficcion",
+      "anio_publicacion": 1967,
+      "autor_id": 1,
+      "created_at": "2026-05-09T18:00:00.000Z",
+      "autor": {
+        "id": 1,
+        "nombre": "Gabriel Garcia Marquez"
+      }
+    },
+    {
+      "id": 3,
+      "titulo": "Fundacion",
+      "isbn": "9780553293357",
+      "genero": "ciencia ficcion",
+      "anio_publicacion": 1951,
+      "autor_id": 2,
+      "created_at": "2026-05-09T18:00:00.000Z",
+      "autor": {
+        "id": 2,
+        "nombre": "Isaac Asimov"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Errores posibles
+
+| Status | `error.code`         | Descripción                                       |
+| ------ | -------------------- | ------------------------------------------------- |
+| 500    | `LIBROS_LIST_ERROR`  | Error interno al consultar.                       |
+
+```json 500 Internal Server Error
+{
+  "success": false,
+  "error": {
+    "code": "LIBROS_LIST_ERROR",
+    "message": "Error al listar libros"
+  }
+}
+```

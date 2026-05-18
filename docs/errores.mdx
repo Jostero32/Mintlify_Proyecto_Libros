@@ -1,0 +1,202 @@
+---
+title: "Manejo de errores"
+description: "Estructura estándar de errores, códigos HTTP y catálogo completo de error.code que devuelve la API."
+icon: "triangle-exclamation"
+---
+
+Todas las respuestas de error de la API siguen el mismo envoltorio JSON, con un código semántico (`error.code`) además del status HTTP. Esto te permite reaccionar a errores específicos sin parsear strings.
+
+## Estructura estándar
+
+Una respuesta de error **siempre** tiene esta forma:
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "ERROR_CODE_EN_SCREAMING_SNAKE_CASE",
+    "message": "Mensaje descriptivo en lenguaje humano"
+  }
+}
+```
+
+<ResponseField name="success" type="boolean" required>
+  Siempre `false` en respuestas de error.
+</ResponseField>
+
+<ResponseField name="error" type="object" required>
+  Detalle del error.
+
+  <Expandable title="Estructura de error">
+    <ResponseField name="code" type="string" required>
+      Código semántico en mayúsculas (ej. `INVALID_ID`, `AUTOR_NOT_FOUND`). Estable — no cambia entre versiones menores de la API.
+    </ResponseField>
+    <ResponseField name="message" type="string" required>
+      Mensaje descriptivo en español. Puede cambiar entre versiones; **no lo uses como discriminador** — usa `code`.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<Tip>
+  Lógica recomendada en el cliente: comparar `json.error.code` (estable) en vez de `json.error.message` (puede cambiar).
+</Tip>
+
+## Códigos HTTP que maneja la API
+
+| Status | Significado en esta API                                                                         |
+| ------ | ----------------------------------------------------------------------------------------------- |
+| `200`  | OK — operación exitosa (GET, PUT, DELETE).                                                      |
+| `201`  | Created — recurso creado (POST exitoso).                                                        |
+| `400`  | Bad Request — entrada inválida o conflicto de negocio (FK, UNIQUE, body malformado).            |
+| `404`  | Not Found — el recurso solicitado no existe, o la ruta HTTP no está registrada.                 |
+| `500`  | Internal Server Error — error inesperado en la base de datos o en el código.                    |
+
+<Note>
+  La API **no** usa actualmente `401`, `403`, `409`, `422` ni `503`. Los conflictos de unicidad y FK se reportan como `400` con un `error.code` específico (`ISBN_DUPLICATE`, `AUTOR_HAS_BOOKS`, `AUTOR_NOT_FOUND` en el contexto de crear libro).
+</Note>
+
+## Catálogo completo de `error.code`
+
+### Errores genéricos
+
+| `error.code`         | HTTP | Endpoint(s)                  | Causa                                                              |
+| -------------------- | ---- | ---------------------------- | ------------------------------------------------------------------ |
+| `ROUTE_NOT_FOUND`    | 404  | Cualquier ruta no registrada | Petición a una ruta que no existe en el router.                    |
+
+### Errores de Autores
+
+| `error.code`           | HTTP | Endpoint                       | Causa                                                                                  |
+| ---------------------- | ---- | ------------------------------ | -------------------------------------------------------------------------------------- |
+| `INVALID_ID`           | 400  | `GET/PUT/DELETE /autores/{id}` | `id` recibido no es un entero positivo (`> 0`).                                        |
+| `INVALID_BODY`         | 400  | `POST /autores`, `PUT /autores/{id}` | Falta `nombre`, o es vacío / solo espacios / no string.                          |
+| `AUTOR_NOT_FOUND`      | 404  | `GET/PUT/DELETE /autores/{id}` | No existe un autor con ese `id`.                                                       |
+| `AUTOR_HAS_BOOKS`      | 400  | `DELETE /autores/{id}`         | El autor tiene libros asociados; la FK con `RESTRICT` bloquea el borrado.              |
+| `AUTORES_LIST_ERROR`   | 500  | `GET /autores`                 | Error interno al consultar la base.                                                    |
+| `AUTOR_GET_ERROR`      | 500  | `GET /autores/{id}`            | Error interno al consultar.                                                            |
+| `AUTOR_CREATE_ERROR`   | 500  | `POST /autores`                | Error interno al insertar.                                                             |
+| `AUTOR_UPDATE_ERROR`   | 500  | `PUT /autores/{id}`            | Error interno al actualizar.                                                           |
+| `AUTOR_DELETE_ERROR`   | 500  | `DELETE /autores/{id}`         | Error interno al eliminar.                                                             |
+
+### Errores de Libros
+
+| `error.code`           | HTTP | Endpoint                       | Causa                                                                                  |
+| ---------------------- | ---- | ------------------------------ | -------------------------------------------------------------------------------------- |
+| `INVALID_ID`           | 400  | `GET/PUT/DELETE /libros/{id}`  | `id` recibido no es un entero positivo.                                                |
+| `INVALID_BODY`         | 400  | `POST /libros`, `PUT /libros/{id}` | Falta alguno de `titulo`, `isbn`, `genero`, `autor_id`, o tipos incorrectos.       |
+| `LIBRO_NOT_FOUND`      | 404  | `GET/PUT/DELETE /libros/{id}`  | No existe un libro con ese `id`.                                                       |
+| `AUTOR_NOT_FOUND`      | 400  | `POST /libros`, `PUT /libros/{id}` | El `autor_id` enviado no existe (FK violation). **Nota:** acá es `400`, no `404`.  |
+| `ISBN_DUPLICATE`       | 400  | `POST /libros`, `PUT /libros/{id}` | El `isbn` ya existe en otro registro (UNIQUE violation).                           |
+| `LIBROS_LIST_ERROR`    | 500  | `GET /libros`                  | Error interno al consultar.                                                            |
+| `LIBRO_GET_ERROR`      | 500  | `GET /libros/{id}`             | Error interno al consultar.                                                            |
+| `LIBRO_CREATE_ERROR`   | 500  | `POST /libros`                 | Error interno al insertar (no clasificado como FK ni UNIQUE).                          |
+| `LIBRO_UPDATE_ERROR`   | 500  | `PUT /libros/{id}`             | Error interno al actualizar.                                                           |
+| `LIBRO_DELETE_ERROR`   | 500  | `DELETE /libros/{id}`          | Error interno al eliminar.                                                             |
+
+## Ejemplos por status
+
+<CodeGroup>
+
+```json 400 - INVALID_BODY
+{
+  "success": false,
+  "error": {
+    "code": "INVALID_BODY",
+    "message": "Los campos titulo, isbn, genero y autor_id son obligatorios"
+  }
+}
+```
+
+```json 400 - ISBN_DUPLICATE
+{
+  "success": false,
+  "error": {
+    "code": "ISBN_DUPLICATE",
+    "message": "El isbn ya existe"
+  }
+}
+```
+
+```json 400 - AUTOR_HAS_BOOKS
+{
+  "success": false,
+  "error": {
+    "code": "AUTOR_HAS_BOOKS",
+    "message": "No se puede eliminar el autor porque tiene libros asociados"
+  }
+}
+```
+
+```json 404 - AUTOR_NOT_FOUND
+{
+  "success": false,
+  "error": {
+    "code": "AUTOR_NOT_FOUND",
+    "message": "Autor no encontrado"
+  }
+}
+```
+
+```json 404 - ROUTE_NOT_FOUND
+{
+  "success": false,
+  "error": {
+    "code": "ROUTE_NOT_FOUND",
+    "message": "Ruta no encontrada"
+  }
+}
+```
+
+```json 500 - *_ERROR
+{
+  "success": false,
+  "error": {
+    "code": "AUTOR_CREATE_ERROR",
+    "message": "Error al crear autor"
+  }
+}
+```
+
+</CodeGroup>
+
+## Patrón para manejar errores en el cliente
+
+<CodeGroup>
+
+```javascript fetch
+async function crearAutor(autor) {
+  const res = await fetch("http://localhost:4040/autores", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(autor),
+  });
+  const json = await res.json();
+
+  if (!json.success) {
+    switch (json.error.code) {
+      case "INVALID_BODY":
+        throw new ValidationError(json.error.message);
+      case "AUTOR_CREATE_ERROR":
+        throw new ServerError("La base no respondió, reintentar más tarde");
+      default:
+        throw new Error(`Error inesperado: ${json.error.code}`);
+    }
+  }
+  return json.data;
+}
+```
+
+```bash cURL (debug)
+# Capturar status y body por separado
+curl -s -o /tmp/body.json -w "HTTP %{http_code}\n" \
+  -X POST http://localhost:4040/autores \
+  -H "Content-Type: application/json" \
+  -d '{}'
+
+cat /tmp/body.json | jq
+```
+
+</CodeGroup>
+
+<Warning>
+  Si recibes un `5xx`, casi siempre es un problema de la base de datos (no levantada, sin tablas, contenedor caído). Revisa `docker compose logs api` y `docker compose ps` antes de asumir un bug en la lógica.
+</Warning>

@@ -1,0 +1,153 @@
+---
+title: "Quickstart"
+description: "Levanta la API REST de Librería en local con Docker Compose"
+icon: "rocket"
+---
+
+Esta guía explica cómo poner en marcha la API en menos de 5 minutos usando Docker Compose, y cómo acceder a la documentación interactiva de Swagger UI.
+
+## Requisitos previos
+
+<CardGroup cols={2}>
+  <Card title="Docker" icon="docker">
+    Docker Engine 24+ o Docker Desktop.
+  </Card>
+  <Card title="Docker Compose" icon="layer-group">
+    Plugin `docker compose` v2 (incluido en Docker Desktop).
+  </Card>
+</CardGroup>
+
+<Tip>
+  No necesitas tener Node.js ni PostgreSQL instalados localmente: ambos viven dentro de los contenedores.
+</Tip>
+
+## Paso 1 · Clonar el repositorio
+
+```bash
+git clone https://github.com/Jostero32/Practica_Con_Mintlify.git
+cd Practica_Con_Mintlify
+```
+
+## Paso 2 · Variables de entorno
+
+El archivo `docker-compose.yml` ya define los valores por defecto para desarrollo local. Estas son las variables que consume cada servicio:
+
+### Servicio `api`
+
+| Variable      | Valor por defecto | Descripción                                  |
+| ------------- | ----------------- | -------------------------------------------- |
+| `PORT`        | `4040`            | Puerto HTTP en el que escucha Express.       |
+| `DB_HOST`     | `db`              | Hostname del contenedor de PostgreSQL.       |
+| `DB_PORT`     | `5432`            | Puerto interno de PostgreSQL.                |
+| `DB_USER`     | `postgres`        | Usuario de la base de datos.                 |
+| `DB_PASSWORD` | `postgres`        | Contraseña del usuario.                      |
+| `DB_NAME`     | `libreria`        | Nombre de la base de datos.                  |
+
+### Servicio `db` (PostgreSQL 16)
+
+| Variable            | Valor por defecto |
+| ------------------- | ----------------- |
+| `POSTGRES_DB`       | `libreria`        |
+| `POSTGRES_USER`     | `postgres`        |
+| `POSTGRES_PASSWORD` | `postgres`        |
+
+<Warning>
+  Los valores por defecto son aptos solo para desarrollo. En producción, sobrescríbelos vía un archivo `.env` o variables del entorno del host.
+</Warning>
+
+<AccordionGroup>
+  <Accordion icon="file-pen" title="Usar un archivo .env (opcional)">
+    Si quieres personalizar los valores sin tocar `docker-compose.yml`, crea un `.env` en la raíz:
+
+    ```bash
+    PORT=4040
+    DB_HOST=db
+    DB_PORT=5432
+    DB_USER=postgres
+    DB_PASSWORD=postgres
+    DB_NAME=libreria
+    ```
+
+    Docker Compose lo cargará automáticamente al ejecutar `docker compose up`.
+  </Accordion>
+</AccordionGroup>
+
+## Paso 3 · Levantar los contenedores
+
+Desde la raíz del proyecto:
+
+```bash
+docker compose up --build
+```
+
+Esto:
+
+1. Construye la imagen de la API a partir del `Dockerfile`.
+2. Arranca PostgreSQL 16 con healthcheck.
+3. Espera a que la base esté saludable antes de iniciar la API.
+4. Ejecuta los seeds iniciales si la base está vacía.
+
+Cuando veas en consola algo similar a:
+
+```text
+libreria_api  | API escuchando en puerto 4040
+```
+
+…la API ya está lista.
+
+## Paso 4 · Verificar que está viva
+
+```bash
+curl http://localhost:4040/health
+```
+
+Respuesta esperada:
+
+```json
+{
+  "success": true,
+  "data": { "service": "api-libreria", "status": "ok" }
+}
+```
+
+## Paso 5 · Acceder a Swagger UI
+
+La API expone su especificación OpenAPI generada con `swagger-jsdoc` y la renderiza con `swagger-ui-express`.
+
+<CardGroup cols={2}>
+  <Card title="Swagger UI" icon="book-open" href="http://localhost:4040/api-docs">
+    Documentación interactiva. Puedes probar los endpoints desde el navegador.
+
+    `http://localhost:4040/api-docs`
+  </Card>
+  <Card title="OpenAPI JSON" icon="code" href="http://localhost:4040/api-docs.json">
+    Especificación cruda en formato JSON, útil para generar clientes o importar en Postman.
+
+    `http://localhost:4040/api-docs.json`
+  </Card>
+</CardGroup>
+
+## Comandos útiles
+
+<AccordionGroup>
+  <Accordion icon="circle-stop" title="Detener los contenedores">
+    ```bash
+    docker compose down
+    ```
+  </Accordion>
+  <Accordion icon="broom" title="Borrar también el volumen de la base de datos">
+    ```bash
+    docker compose down -v
+    ```
+    Útil para empezar desde cero (los seeds se volverán a ejecutar en el próximo arranque).
+  </Accordion>
+  <Accordion icon="terminal" title="Ver logs solo de la API">
+    ```bash
+    docker compose logs -f api
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<Note>
+  Una vez levantado el proyecto, continúa con la documentación de cada recurso en **API Reference - Autores** y **API Reference - Libros**.
+</Note>

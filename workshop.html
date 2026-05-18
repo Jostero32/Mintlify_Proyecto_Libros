@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Taller — Documentar una API REST con Mintlify</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+
+<style>
+  :root {
+    --primary: #0F766E;
+    --light: #14B8A6;
+    --dark: #115E59;
+    --bg: #FFFFFF;
+    --bg-alt: #F8FAFC;
+    --bg-code: #1E293B;
+    --text: #0F172A;
+    --text-muted: #64748B;
+    --border: #E2E8F0;
+    --note-bg: #ECFDF5;
+    --note-border: #14B8A6;
+    --warn-bg: #FFFBEB;
+    --warn-border: #F59E0B;
+    --tip-bg: #EFF6FF;
+    --tip-border: #3B82F6;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 1rem; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--text);
+    background: var(--bg);
+  }
+  .layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    min-height: 100vh;
+  }
+  .sidebar {
+    background: var(--bg-alt);
+    border-right: 1px solid var(--border);
+    padding: 1.5rem 1rem;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  .sidebar h1 {
+    font-size: 1rem;
+    color: var(--primary);
+    margin: 0 0 1.5rem;
+    font-weight: 700;
+  }
+  .sidebar h1 small {
+    display: block;
+    color: var(--text-muted);
+    font-weight: 400;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+  }
+  .sidebar nav { display: flex; flex-direction: column; gap: 0.15rem; }
+  .sidebar nav a {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    border-left: 3px solid transparent;
+  }
+  .sidebar nav a:hover { background: rgba(15, 118, 110, 0.08); color: var(--primary); }
+  .sidebar nav a.active {
+    background: rgba(15, 118, 110, 0.12);
+    color: var(--primary);
+    border-left-color: var(--primary);
+    font-weight: 600;
+  }
+  .sidebar nav .step-num {
+    display: inline-block;
+    width: 1.8rem;
+    color: var(--light);
+    font-weight: 600;
+    font-size: 0.8rem;
+  }
+  main {
+    padding: 2.5rem 3rem;
+    max-width: 920px;
+  }
+  h1.title {
+    font-size: 2.25rem;
+    color: var(--text);
+    margin: 0 0 0.25rem;
+  }
+  .subtitle {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    margin: 0 0 2rem;
+  }
+  h2 {
+    font-size: 1.75rem;
+    color: var(--text);
+    margin: 3rem 0 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--border);
+  }
+  h2 .step-tag {
+    display: inline-block;
+    background: var(--primary);
+    color: white;
+    font-size: 0.75rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    vertical-align: middle;
+    margin-right: 0.5rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+  h3 { font-size: 1.2rem; color: var(--dark); margin: 2rem 0 0.75rem; }
+  h4 { font-size: 1rem; color: var(--text); margin: 1.5rem 0 0.5rem; }
+  p { margin: 0.75rem 0; }
+  a { color: var(--primary); }
+  ul, ol { padding-left: 1.5rem; }
+  li { margin: 0.25rem 0; }
+  hr { border: 0; border-top: 1px solid var(--border); margin: 3rem 0; }
+  code:not([class*="language-"]) {
+    background: var(--bg-alt);
+    color: var(--dark);
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.875em;
+    border: 1px solid var(--border);
+  }
+  pre {
+    margin: 0.75rem 0;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    background: var(--bg-code);
+  }
+  pre code { font-size: 0.85rem; line-height: 1.5; }
+  .code-block {
+    position: relative;
+    margin: 1rem 0;
+  }
+  .code-block .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #0F172A;
+    color: #94A3B8;
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    border-radius: 8px 8px 0 0;
+  }
+  .code-block .code-header + pre { margin-top: 0; border-radius: 0 0 8px 8px; }
+  .copy-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: #E2E8F0;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .copy-btn:hover { background: rgba(255, 255, 255, 0.2); }
+  .copy-btn.copied { background: var(--light); color: white; border-color: var(--light); }
+  .callout {
+    border-left: 4px solid;
+    padding: 0.75rem 1rem;
+    margin: 1rem 0;
+    border-radius: 4px;
+    font-size: 0.95rem;
+  }
+  .callout.note { background: var(--note-bg); border-color: var(--note-border); }
+  .callout.warn { background: var(--warn-bg); border-color: var(--warn-border); }
+  .callout.tip  { background: var(--tip-bg);  border-color: var(--tip-border); }
+  .callout strong { color: var(--dark); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+  }
+  th, td {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+  th { background: var(--bg-alt); font-weight: 600; color: var(--dark); }
+  .verify {
+    background: #ECFDF5;
+    border: 1px solid #6EE7B7;
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+  }
+  .verify::before {
+    content: "✓ Verificación: ";
+    font-weight: 700;
+    color: #047857;
+  }
+  .duration {
+    display: inline-block;
+    background: var(--bg-alt);
+    color: var(--text-muted);
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-left: 0.5rem;
+  }
+  .hero {
+    background: linear-gradient(135deg, var(--primary), var(--light));
+    color: white;
+    padding: 1.5rem 2rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+  }
+  .hero h1 { color: white; margin: 0; font-size: 1.5rem; }
+  .hero p { margin: 0.5rem 0 0; opacity: 0.95; font-size: 0.95rem; }
+  .hero code { background: rgba(255,255,255,0.2); color: white; border: 0; }
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--border); }
+    main { padding: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+<aside class="sidebar">
+  <h1>Taller Mintlify
+    <small>De API REST sin docs a sitio público interactivo</small>
+  </h1>
+  <nav id="toc">
+    <a href="#inicio">Inicio</a>
+    <a href="#setup">Setup inicial</a>
+    <a href="#paso-1"><span class="step-num">1</span>Estructura base</a>
+    <a href="#paso-2"><span class="step-num">2</span>Páginas conceptuales</a>
+    <a href="#paso-3"><span class="step-num">3</span>GET de Autores</a>
+    <a href="#paso-4"><span class="step-num">4</span>GET de Libros</a>
+    <a href="#paso-5"><span class="step-num">5</span>Playground con OpenAPI</a>
+    <a href="#paso-6"><span class="step-num">6</span>Fix del proxy</a>
+    <a href="#paso-65"><span class="step-num">6.5</span>Múltiples baseUrls</a>
+    <a href="#paso-7"><span class="step-num">7</span>Deploy a Mintlify Cloud</a>
+    <a href="#paso-75"><span class="step-num">7.5</span>Cloudflare Tunnel</a>
+    <a href="#cierre">Cierre</a>
+  </nav>
+</aside>
+
+<main>
+
+<section id="inicio">
+  <h1 class="title">Documentar una API REST con Mintlify</h1>
+  <p class="subtitle">Taller práctico — partimos de una API con Docker y Swagger ya hechos, y construimos el sitio de documentación con playground interactivo desde una carpeta vacía.</p>
+
+  <div class="hero">
+    <h1>Punto de partida → punto de llegada</h1>
+    <p><strong>De:</strong> carpeta <code>Practica_Sin_Mintlify</code> (API + Docker + Swagger listos)</p>
+    <p><strong>A:</strong> carpeta <code>Practica_Con_Mintlify</code> (con <code>docs/</code> completo)</p>
+    <p>Lo único que vamos a crear hoy es la carpeta <code>docs/</code> — <strong>desde cero, sin descargar templates</strong>.</p>
+  </div>
+
+  <div class="callout warn">
+    <strong>Importante:</strong> NO vamos a aceptar el scaffold del Plant Store que ofrece <code>mint dev</code> la primera vez. Creamos todos los archivos a mano.
+  </div>
+
+  <div class="callout note">
+    <strong>Nota:</strong> la introducción teórica ("qué es Mintlify, por qué, comparativa") se da en vivo antes del Paso 1.
+  </div>
+</section>
+
+<section id="setup">
+  <h2><span class="step-tag">SETUP</span>Verificación del kit inicial<span class="duration">5 min</span></h2>
+
+  <p>El kit que ya recibieron trae todo el backend listo. Antes de empezar, confirmamos que funcione.</p>
+
+  <h3>1. Instalar dependencias</h3>
+  <div class="code-block">
+    <div class="code-header"><span>bash</span><button class="copy-btn">Copy</button></div>
+<pre><code class="language-bash">cd Practica_Sin_Mintlify
+npm install</code></pre>
+  </div>
+
+  <h3>2. Levantar Docker</h3>
+  <div class="code-block">
+    <div class="code-header"><span>bash</span><button class="copy-btn">Copy</button></div>
+<pre><code class="language-bash">docker compose up --build</code></pre>
+  </div>
+
+  <p>Esperá ver <code>API escuchando en puerto 4040</code>.</p>
+
+  <h3>3. Probar el endpoint de salud</h3>
+  <div class="code-block">
+    <div class="code-header"><span>bash</span><button class="copy-btn">Copy</button></div>
+<pre><code class="language-bash">curl http://localhost:4040/health</code></pre>
+  </div>
+
+  <div class="verify">Si responde <code>{ "success": true, ... }</code>, el kit está OK y podemos arrancar.</div>
+</section>
+
+<hr />
+
+<section id="paso-1">
+  <h2><span class="step-tag">PASO 1</span>Estructura base de Mintlify<span class="duration">10 min</span></h2>
+
+  <p><strong>Objetivo:</strong> instalar el CLI, crear la carpeta <code>docs/</code> desde cero, y ver el preview en el navegador.</p>
+
+  <h3>1.1 Instalar el CLI</h3>
+  <div class="code-block">
+    <div class="code-header"><span>bash</span><button class="copy-btn">Copy</button></div>
+<pre><code class="language-bash">npm i -g mint</code></pre>
+  </div>
+
+  <div class="callout warn">
+    <strong>Cuando arranques <code>mint dev</code>:</strong> si el CLI pregunta "scaffold a starter project?" → siempre <strong>NO</strong>. Vamos a crear todo manualmente.
+  </div>
+
+  <h3>1.2 Crear la carpeta <code>docs/</code> vacía</h3>
+  <div class="code-block">
+    <div class="code-header"><span>bash</span><button class="copy-btn">Copy</button></div>
+<pre><code class="language-bash">mkdir docs
+cd docs</code></pre>
+  </div>
+
+  <h3>1.3 Crear <code>docs/mint.json</code></h3>
+  <div class="code-block">
+    <div class="code-header"><span>docs/mint.json</span><button class="copy-btn">Copy</button></div>
+<pre><code class="language-json">{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "Librería API",
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#0F766E",
+    "light": "#14B8A6",
+    "dark": "#115E59"
+  },
+  "navigation": [
+    {
+      "group": "Inicio",
+      "pages": ["introduction"]
+    }
+  ]
+}</code></pre>
+  </div>
+
+  <h3>1.4 Crear <code>docs/favicon.svg</code></h3>
+  <div class="code-block">
+    <div class="code-header"><span>docs/favicon.svg</span><button class="copy-btn">Copy</button></div>
+<pre><code class="language-markup">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#0F766E"&gt;
+  &lt;path d="M19 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h13a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1zm-1 18H6V4h12v16zM8 7h8v1H8V7zm0 3h8v1H8v-1zm0 3h5v1H8v-1z"/&gt;
+&lt;/svg&gt;</code></pre>
+  </div>
+
+  <h3>1.5 Crear <code>docs/introduction.mdx</code></h3>
+  <div class="code-block">
+    <div class="code-header"><span>docs/introduction.mdx</span><button class="copy-btn">Copy</button></div>
+<pre><code class="language-markdown">---
+title: "Introducción"
+description: "Descripción general de la API REST de Librería"
+---
+
+# Librería API
+
+API REST construida con **Node.js**, **Express**, **Sequelize** y **PostgreSQL**, empaquetada con **Docker Compose** y documentada con **Swagger/OpenAPI**.
+
+Permite gestionar dos entidades:
+
+- **Autores**: personas que escriben libros.
+- **Libros**: obras catalogadas, cada una asociada a un autor.
+
+&lt;Card title="Base URL" icon="globe"&gt;
+  `http://localhost:4040`
+&lt;/Card&gt;</code></pre>
+  </div>
+
+  <h3>1.6 Crear <code>docs/index.mdx</code></h3>
+  <div class="code-block">
+    <div class="code-header"><span>docs/index.mdx</span><button class="copy-btn">Copy</button></div>
+<pre><code class="language-markdown">---
+title: "Librería API"
+description: "Documentación del proyecto"
+icon: "book"
+---
+
+&lt;CardGroup cols={2}&gt;
+  &lt;Card title="Introducción" icon="circle-info" href="/introduction"&gt;
+    Visión general del proyecto y el stack.
+  &lt;/Card&gt;
+  &lt;Card title="Quickstart" icon="rocket" href="/quickstart"&gt;
+    Levanta el proyecto en menos de 5 minutos.
+  &lt;/Card&gt;
+&lt;/CardGroup&gt;</code></pre>
+  </div>
+
+  <h3>1.7 Arrancar el preview</h3>
+  <p>Desde dentro de <code>docs/</code>:</p>
+  <div class="code-block">
+    <div class="code-header"><span>bash</span><button class="copy-btn">Copy</button></div>
+<pre><code class="language-bash">mint dev --port 3000</code></pre>
+  </div>
+
+  <p>Si el CLI pregunta por scaffold → <strong>No</strong>.</p>
+  <p>Abrí <code>http://localhost:3000</code>.</p>
+
+  <div class="verify">Ves la home con los colores configurados y un link a Introduction.</div>
+</section>
+
+<hr />
+
+<section id="paso-2">
+  <h2><span class="step-tag">PASO 2</span>Páginas conceptuales<span class="duration">25 min</span></h2>
+
+  <p><strong>Objetivo:</strong> documentar el "qué" del proyecto antes de tocar endpoints.</p>
+
+  <h3>2.1 Crear <code>docs/quickstart.mdx</code></h3>
+  <div class="code-block">
+    <div class="code-header"><span>docs/quickstart.mdx</span><button class="copy-btn">Copy</button></div>
+<pre><code class="language-markdown">---
+title: "Quickstart"
+description: "Levanta la API en local con Docker Compose"
+icon: "rocket"
+---
+
+## Requisitos
+
+- Docker Desktop o Docker Engine + Compose v2
+
+## Pasos
+
+```bash
+docker compose up --build
+```
+
+Cuando veas `API escuchando en puerto 4040`, prueba:
+
+```bash
+curl http://localhost:4040/health
+```
+
+## Variables de entorno
+
+| Variable | Valor por defecto | Descripción |
+|---|---|---|
+| `PORT` | `4040` | Puerto HTTP de Express |
+| `DB_HOST` | `db` | Hostname del contenedor de Postgres |
+| `DB_PORT` | `5432` | Puerto interno de Postgres |
+| `DB_USER` | `postgres` | Usuario de la BD |
+| `DB_PASSWORD` | `postgres` | Contraseña |
+| `DB_NAME` | `libreria` | Nombre de la BD |
+
+## Acceso a Swagger UI
+
+- Swagger UI interactivo: `http://localhost:4040/api-docs`
+- OpenAPI JSON: `http://localhost:4040/api-docs.json`</code></pre>
+  </div>
+
+  <h3>2.2 Crear <code>docs/models.mdx</code></h3>
+  <div class="code-block">
+    <div class="code-header"><span>docs/models.mdx</span><button class="copy-btn">Copy</button></div>
+<pre><code class="language-markdown">---
+title: "Modelos de datos"
+description: "Modelos Sequelize: Autor, Libro y su relación"
+icon: "database"
+---
+
+## Autor
+
+Tabla SQL: `autores`.
+
+| Campo | Tipo | Null | Notas |
+|---|---|---|---|
+| `id` | `INTEGER` | NO | PK autoincremental |
+| `nombre` | `VARCHAR(150)` | NO | Obligatorio |
+| `biografia` | `TEXT` | SÍ | Opcional |
+| `created_at` | `TIMESTAMPTZ` | NO | Default `NOW()` |
+
+## Libro
+
+Tabla SQL: `libros`.
+
+| Campo | Tipo | Null | Notas |
+|---|---|---|---|
+| `id` | `INTEGER` | NO | PK autoincremental |
+| `titulo` | `VARCHAR(200)` | NO | Obligatorio |
+| `isbn` | `VARCHAR(50)` | NO | **UNIQUE** |
+| `genero` | `VARCHAR(100)` | NO | Filtrable case-insensitive |
+| `anio_publicacion` | `INTEGER` | SÍ | Opcional |
+| `autor_id` | `INTEGER` | NO | **FK** → `autores.id` (RESTRICT) |
+| `created_at` | `TIMESTAMPTZ` | NO | Default `NOW()` |
+
+## Relación
+
+Un autor tiene **muchos** libros; un libro pertenece a **un** autor.
+
+```js
+Autor.hasMany(Libro, { foreignKey: "autor_id", as: "libros", onDelete: "RESTRICT" });
+Libro.belongsTo(Autor, { foreignKey: "autor_id", as: "autor" });
+```
+
+&lt;Warning&gt;
+  Con `onDelete: RESTRICT` no se puede eliminar un autor con libros. Primero borra (o reasigna) sus libros.
+&lt;/Warning&gt;</code></pre>
+  </div>
+
+  <h3>2.3 Crear <code>docs/errores.mdx</code></h3>
+  <div class="code-block">
+    <div class="code-header"><span>docs/errores.mdx</span><button class="copy-btn">Copy</button></div>
+<pre><code class="language-markdown">---
+title: "Manejo de errores"
+description: "Estructura estándar de errores y códigos"
+icon: "triangle-exclamation"
+---
+
+## Estructura
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Mensaje descriptivo"
+  }
+}
+```
+
+&lt;Tip&gt;
+  Compara siempre `error.code` (estable), nunca `error.message` (puede cambiar).
+&lt;/Tip&gt;
+
+## Códigos HTTP que maneja la API
+
+| Status | Significado |
+|---|---|
+| `200` | OK |
+| `201` | Created |
+| `400` | Body/parámetros inválidos o conflicto de negocio (FK, UNIQUE) |
+| `404` | Recurso no existe o ruta no registrada |
+| `500` | Error interno inesperado |
+
+## Catálogo de `error.code`
+
+| `error.code` | HTTP | Causa |
+|---|---|---|
+| `INVALID_ID` | 400 | `id` no es entero positivo |
+| `INVALID_BODY` | 400 | Body con campos faltantes o tipos incorrectos |
+| `AUTOR_NOT_FOUND` | 404 / 400 | Autor inexistente |
+| `AUTOR_HAS_BOOKS` | 400 | Eliminar autor con libros (FK RESTRICT) |
+| `LIBRO_NOT_FOUND` | 404 | Libro inexistente |
+| `ISBN_DUPLICATE` | 400 | ISBN ya existe (UNIQUE) |
+| `ROUTE_NOT_FOUND` | 404 | Ruta no registrada |
+| `*_ERROR` | 500 | Error interno |</code></pre>
+  </div>
+
+  <h3>2.4 Crear <code>docs/docker.mdx</code></h3>
+  <div class="code-block">
+    <div class="code-header"><span>docs/docker.mdx</span><button class="copy-btn">Copy</button></div>
+<pre><code class="language-markdown">---
+title: "Configuración Docker"
+description: "Servicios, puertos, volúmenes y healthchecks del proyecto"
+icon: "docker"
+---
+
+## Servicios
+
+### `db` — PostgreSQL 16
+
+- Imagen `postgres:16-alpine`
+- Volumen `postgres_data` para persistencia
+- Healthcheck combinado: `pg_isready` + `SELECT 1` real sobre la base `libreria`
+
+### `api` — Node.js + Express
+
+- Build desde `Dockerfile` local
+- Puerto `4040:4040` mapeado al host
+- `depends_on: db` con `condition: service_healthy`
+- Healthcheck propio: `GET /health`
+
+## Variables de entorno (servicio `api`)
+
+| Variable | Valor |
+|---|---|
+| `PORT` | `4040` |
+| `DB_HOST` | `db` |
+| `DB_PORT` | `5432` |
+| `DB_USER` | `postgres` |
+| `DB_PASSWORD` | `postgres` |
+| `DB_NAME` | `libreria` |
+
+&lt;Note&gt;
+  Las tablas las crea la API misma con `sequelize.sync({ alter: true })` al arrancar — no Postgres.
+&lt;/Note&gt;</code></pre>
+  </div>
+
+  <h3>2.5 Actualizar <code>docs/mint.json</code></h3>
+  <p>Reemplazá el bloque <code>navigation</code> por:</p>
+  <div class="code-block">
+    <div class="code-header"><span>docs/mint.json (parcial)</span><button class="copy-btn">Copy</button></div>
+<pre><code class="language-json">"navigation": [
+  {
+    "group": "Inicio",
+    "pages": ["introduction", "quickstart"]
+  },
+  {
+    "group": "Guías",
+    "pages": ["models", "errores", "docker"]
+  }
+]</code></pre>
+  </div>
+
+  <div class="verify">Sidebar muestra dos grupos. Las 5 páginas (intro, quickstart, models, errores, docker) renderizan.</div>
+</section>
+
+<hr />
+
+<section id="paso-3">
+  <h2><span class="step-tag">PASO 3</span>GET de Autores<span class="duration">8 min</span></h2>
+
+  <p><strong>Objetivo:</strong> aprender el patrón de página de endpoint con el GET de la lista de autores.</p>
+
+  <h3>3.1 Crear <code>docs/api-reference/autores/list.mdx</code></h3>
+  <div class="code-block">
+    <div class="code-header"><span>docs/api-reference/autores/list.mdx</span><button class="copy-btn">Copy</button></div>
+<pre><code class="language-markdown">---
+title: "Listar autores"
+description: "Devuelve todos los autores registrados"
+api: "GET /autores"
+---
+
+Recupera la lista completa de autores, ordenada por `id` ascendente. No recibe parámetros.
+
+## Ejemplos de request
+
+&lt;CodeGroup&gt;
+
+```bash cURL
+curl http://localhost:4040/autores
+```
+
+```javascript fetch
+const res = await fetch("http://localhost:4040/autores");
+const json = await res.json();
+console.log(json.data);
+```
+
+&lt;/CodeGroup&gt;
+
+## Respuesta exitosa
+
+&lt;ResponseField name="success" type="boolean" required /&gt;
+&lt;ResponseField name="data" type="Autor[]" required&gt;
+  &lt;Expandable title="Estructura de Autor"&gt;
+    &lt;ResponseField name="id" type="integer" /&gt;
+    &lt;ResponseField name="nombre" type="string" /&gt;
+    &lt;ResponseField name="biografia" type="string | null" /&gt;
+    &lt;ResponseField name="created_at" type="string (ISO 8601)" /&gt;
+  &lt;/Expandable&gt;
+&lt;/ResponseField&gt;
+
+&lt;ResponseExample&gt;
+
+```json 200 OK
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "nombre": "Gabriel Garcia Marquez",
+      "biografia": "Novelista colombiano.",
+      "created_at": "2026-05-09T18:00:00.000Z"
+    }
+  ]
+}
+```
+
+&lt;/ResponseExample&gt;
+
+## Errores
+
+| Status | `error.code` | Causa |
+|---|---|---|
+| 500 | `AUTORES_LIST_ERROR` | Error interno al consultar |</code></pre>
+  </div>
+
+  <h3>3.2 Actualizar <code>docs/mint.json</code></h3>
+  <p>Añadí al array <code>navigation</code>:</p>
+  <div class="code-block">
+    <div class="code-header"><span>docs/mint.json (añadir al navigation)</span><button class="copy-btn">Copy</button></div>
+<pre><code class="language-json">{
+  "group": "API Reference",
+  "pages": ["api-reference/autores/list"]
+}</code></pre>
+  </div>
+
+  <div class="verify">Página "Listar autores" aparece bajo "API Reference".</div>
+</section>
+
+<hr />
+
+<section id="paso-4">
+  <h2><span class="step-tag">PASO 4</span>GET de Libros<span class="duration">8 min</span></h2>
+
+  <p><strong>Objetivo:</strong> repetir el patrón con un recurso que tiene query param y autor anidado.</p>
+
+  <h3>4.1 Crear <code>docs/api-reference/libros/list.mdx</code></h3>
+  <div class="code-block">
+    <div class="code-header"><span>docs/api-reference/libros/list.mdx</span><button class="copy-btn">Copy</button></div>
+<pre><code class="language-markdown">---
+title: "Listar libros"
+description: "Lista todos los libros con su autor, opcionalmente filtrado por género"
+api: "GET /libros"
+---
+
+Cada libro viene con un objeto `autor` anidado (id + nombre).
+
+## Query params
+
+&lt;ParamField query="genero" type="string"&gt;
+  Filtra por género (case-insensitive, match exacto). Ejemplos: `ficcion`, `historia`, `ciencia ficcion`.
+&lt;/ParamField&gt;
+
+## Ejemplos
+
+&lt;CodeGroup&gt;
+
+```bash cURL (todos)
+curl http://localhost:4040/libros
+```
+
+```bash cURL (filtrado)
+curl "http://localhost:4040/libros?genero=ficcion"
+```
+
+```javascript fetch
+const params = new URLSearchParams({ genero: "ficcion" });
+const res = await fetch(`http://localhost:4040/libros?${params}`);
+```
+
+&lt;/CodeGroup&gt;
+
+## Respuesta exitosa
+
+&lt;ResponseExample&gt;
+
+```json 200 OK
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "titulo": "Cien anos de soledad",
+      "isbn": "9780307474728",
+      "genero": "ficcion",
+      "anio_publicacion": 1967,
+      "autor_id": 1,
+      "autor": { "id": 1, "nombre": "Gabriel Garcia Marquez" }
+    }
+  ]
+}
+```
+
+&lt;/ResponseExample&gt;
+
+## Errores
+
+| Status | `error.code` |
+|---|---|
+| 500 | `LIBROS_LIST_ERROR` |</code></pre>
+  </div>
+
+  <h3>4.2 Actualizar <code>docs/mint.json</code></h3>
+  <p>Añadí la nueva página al grupo "API Reference" existente:</p>
+  <div class="code-block">
+    <div class="code-header"><span>docs/mint.json (parcial)</span><button class="copy-btn">Copy</button></div>
+<pre><code class="language-json">{
+  "group": "API Reference",
+  "pages": [
+    "api-reference/autores/list",
+    "api-reference/libros/list"
+  ]
+}</code></pre>
+  </div>
+
+  <div class="verify">Sidebar muestra los dos endpoints bajo "API Reference".</div>
+</section>
+
+<hr />
+
+<section id="paso-5">
+  <h2><span class="step-tag">PASO 5</span>Playground con OpenAPI<span class="duration">15 min</span></h2>
+
+  <p><strong>Objetivo:</strong> que cada página de endpoint tenga un botón <strong>Send</strong> que llame a la API real.</p>
+
+  <h3>5.1 Ver el spec que Swagger ya genera</h3>
+  <p>Con Docker arriba, abrí en el navegador:</p>
+  <ul>
+    <li><a href="http://localhost:4040/api-docs" target="_blank"><code>http://localhost:4040/api-docs</code></a> — <strong>Swagger UI</strong> (interfaz interactiva)</li>
+    <li><a href="http://localhost:4040/api-docs.json" target="_blank"><code>http://localhost:4040/api-docs.json</code></a> — <strong>JSON crudo</strong> del spec OpenAPI</li>
+  </ul>
+  <div class="callout note">
+    La API ya construye este JSON internamente con <code>swagger-jsdoc</code> leyendo los JSDoc de <code>src/routes/*.js</code>. Vamos a usar ese mismo JSON como fuente del playground de Mintlify.
+  </div>
+
+  <h3>5.2 Copiar el spec a <code>docs/openapi.json</code></h3>
+  <ol>
+    <li>Abrí <code>http://localhost:4040/api-docs.json</code> en el navegador</li>
+    <li><strong>Ctrl+A</strong> (seleccionar todo) → <strong>Ctrl+C</strong> (copiar)</li>
+    <li>Creá un archivo nuevo <code>docs/openapi.json</code> y pegá el contenido</li>
+    <li>Guardá</li>
+  </ol>
+  <div class="callout tip">
+    <strong>Para sus proyectos reales:</strong> el kit ya trae <code>scripts/export-openapi.js</code> + el comando <code>npm run docs:openapi</code> que hace exactamente lo mismo sin abrir el navegador, y se ejecuta solo antes de <code>npm start</code> gracias al hook <code>prestart</code>. Hoy lo hicimos manual para ver visualmente la conexión.
+  </div>
+
+  <h3>5.3 Actualizar <code>docs/mint.json</code></h3>
+  <p>Añadí dos campos a la raíz (junto a <code>name</code>, <code>colors</code>, <code>navigation</code>):</p>
+  <div class="code-block">
+    <div class="code-header"><span>docs/mint.json (parcial)</span><button class="copy-btn">Copy</button></div>
+<pre><code class="language-json">"openapi": ["openapi.json"],
+"api": {
+  "baseUrl": "http://localhost:4040",
+  "playground": {
+    "mode": "show"
+  }
+}</code></pre>
+  </div>
+
+  <h3>5.4 Cambiar <code>api:</code> por <code>openapi:</code> en los 2 frontmatters</h3>
+  <p>En estos 2 archivos, cambiá <code>api: "GET /ruta"</code> → <code>openapi: "GET /ruta"</code>:</p>
+  <ul>
+    <li><code>docs/api-reference/autores/list.mdx</code></li>
+    <li><code>docs/api-reference/libros/list.mdx</code></li>
+  </ul>
+
+  <div class="code-block">
+    <div class="code-header"><span>diff</span><button class="copy-btn">Copy</button></div>
+<pre><code class="language-diff">- api: "GET /autores"
++ openapi: "GET /autores"</code></pre>
+  </div>
+
+  <div class="verify">En cualquier página de endpoint aparece el panel del playground a la derecha con un botón <strong>Send</strong>.</div>
+</section>
+
+<hr />
+
+<section id="paso-6">
+  <h2><span class="step-tag">PASO 6</span>Fix del proxy de Mintlify<span class="duration">10 min</span></h2>
+
+  <p><strong>Objetivo:</strong> experimentar un error real, diagnosticarlo y aprender qué hace el proxy de Mintlify.</p>
+
+  <h3>6.1 Disparar el error</h3>
+  <p>En una página de endpoint, dar <strong>Send</strong> sin tocar nada.</p>
+
+  <p><strong>Resultado esperado:</strong></p>
+  <div class="code-block">
+    <div class="code-header"><span>json</span><button class="copy-btn">Copy</button></div>
+<pre><code class="language-json">{ "error": true, "errorMessage": "invalid URL" }</code></pre>
+  </div>
+
+  <h3>6.2 Explicar el problema</h3>
+  <div class="callout note">
+    Por defecto, Mintlify rutea las requests del playground a través de <strong>su proxy cloud</strong>. Ese proxy intenta resolver <code>http://localhost:4040</code> desde <strong>sus servidores</strong>, no desde tu máquina. Por eso falla.
+  </div>
+
+  <h3>6.3 Aplicar el fix</h3>
+  <p>En <code>docs/mint.json</code>, dentro del bloque <code>api.playground</code>, añadí <code>disableProxy: true</code>:</p>
+  <div class="code-block">
+    <div class="code-header"><span>docs/mint.json (parcial)</span><button class="copy-btn">Copy</button></div>
+<pre><code class="language-json">"playground": {
+  "mode": "show",
+  "disableProxy": true
+}</code></pre>
+  </div>
+
+  <p>Refrescá y volvé a dar <strong>Send</strong>.</p>
+
+  <div class="verify">Ahora la request va directo del navegador a <code>localhost:4040</code> y ves la respuesta JSON real bajo el botón.</div>
+</section>
+
+<hr />
+
+<section id="paso-65">
+  <h2><span class="step-tag">PASO 6.5</span>Múltiples baseUrls (dropdown en el playground)<span class="duration">8 min</span></h2>
+
+  <p><strong>Objetivo:</strong> que el playground muestre un selector para elegir entre diferentes entornos (local, túnel, producción).</p>
+
+  <h3>6.5.1 Cambiar <code>baseUrl</code> de string a array</h3>
+  <p>En <code>docs/mint.json</code>, dentro del bloque <code>api</code>, reemplazá:</p>
+  <div class="code-block">
+    <div class="code-header"><span>docs/mint.json (parcial)</span><button class="copy-btn">Copy</button></div>
+<pre><code class="language-diff">- "baseUrl": "http://localhost:4040",
++ "baseUrl": [
++   "http://localhost:4040",
++   "https://placeholder.trycloudflare.com"
++ ],</code></pre>
+  </div>
+
+  <h3>6.5.2 Verificación</h3>
+  <p>Refrescá. En el playground, ahora aparece un <strong>dropdown sobre el botón Send</strong> con las dos URLs. La primera es la activa por defecto.</p>
+
+  <div class="callout tip">
+    La segunda URL (<code>placeholder.trycloudflare.com</code>) es un placeholder. La reemplazaremos en el Paso 7.5 cuando tengamos la URL real del túnel.
+  </div>
+
+  <h3>6.5.3 Por qué esto importa</h3>
+  <ul>
+    <li>En local: usás <code>localhost:4040</code></li>
+    <li>Cuando desplegues el sitio a Mintlify Cloud, el visitante puede elegir si pegarle a su localhost o a tu túnel público</li>
+    <li>Si en el futuro tenés un staging o producción, agregás más URLs al array</li>
+  </ul>
+</section>
+
+<hr />
+
+<section id="paso-7">
+  <h2><span class="step-tag">PASO 7</span>Deploy a Mintlify Cloud<span class="duration">20 min</span></h2>
+
+  <p><strong>Objetivo:</strong> publicar el sitio en una URL pública con deploy continuo desde GitHub.</p>
+
+  <h3>7.1 Subir a GitHub</h3>
+  <div class="code-block">
+    <div class="code-header"><span>bash</span><button class="copy-btn">Copy</button></div>
+<pre><code class="language-bash">git init
+git add .
+git commit -m "Workshop: docs en Mintlify"
+gh repo create libreria-api-docs --public --source=. --remote=origin --push</code></pre>
+  </div>
+
+  <p>Si no tenés <code>gh</code>, creá el repo desde la UI de GitHub y hacé <code>git push</code>.</p>
+
+  <h3>7.2 Conectar Mintlify</h3>
+  <ol>
+    <li>Cuenta en <a href="https://mintlify.com" target="_blank">https://mintlify.com</a></li>
+    <li>Dashboard → Settings → GitHub App → instalar en tu repo</li>
+    <li>Connect repository → especificar que la carpeta de docs es <code>docs/</code></li>
+    <li>Primer deploy automático en <code>&lt;tu-org&gt;.mintlify.app</code></li>
+  </ol>
+
+  <div class="verify">Abrís <code>https://&lt;tu-org&gt;.mintlify.app</code> y ves todo el sitio. Cada <code>git push origin main</code> redeploys.</div>
+</section>
+
+<hr />
+
+<section id="paso-75">
+  <h2><span class="step-tag">PASO 7.5</span>(Opcional) Cloudflare Tunnel + actualizar baseUrl<span class="duration">15 min</span></h2>
+
+  <div class="callout tip">
+    Este paso es <strong>independiente</strong> del Paso 6. El Paso 6 trataba del <em>proxy de Mintlify</em> (cómo el playground manda requests). Este Paso 7.5 trata del <em>Cloudflare Tunnel</em> (cómo el mundo llega a tu API local).
+  </div>
+
+  <h3>7.5.1 Instalar cloudflared</h3>
+  <p>Descargá desde: <a href="https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/" target="_blank">developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads</a></p>
+
+  <h3>7.5.2 Abrir túnel temporal</h3>
+  <p>Con Docker corriendo:</p>
+  <div class="code-block">
+    <div class="code-header"><span>bash</span><button class="copy-btn">Copy</button></div>
+<pre><code class="language-bash">cloudflared tunnel --url http://localhost:4040</code></pre>
+  </div>
+
+  <p>Salida (anotá la URL pública):</p>
+  <div class="code-block">
+    <div class="code-header"><span>output</span><button class="copy-btn">Copy</button></div>
+<pre><code class="language-plaintext">Your quick Tunnel has been created! Visit it at:
+https://xxx-xxx-xxx.trycloudflare.com</code></pre>
+  </div>
+
+  <h3>7.5.3 Reemplazar el placeholder en <code>mint.json</code></h3>
+  <p>Cambiá <code>https://placeholder.trycloudflare.com</code> por la URL real del túnel:</p>
+  <div class="code-block">
+    <div class="code-header"><span>docs/mint.json (parcial)</span><button class="copy-btn">Copy</button></div>
+<pre><code class="language-json">"baseUrl": [
+  "http://localhost:4040",
+  "https://xxx-xxx-xxx.trycloudflare.com"
+],</code></pre>
+  </div>
+
+  <h3>7.5.4 Push y verificar</h3>
+  <div class="code-block">
+    <div class="code-header"><span>bash</span><button class="copy-btn">Copy</button></div>
+<pre><code class="language-bash">git add docs/mint.json
+git commit -m "Apuntar baseUrl al tunnel"
+git push</code></pre>
+  </div>
+
+  <p>Esperá el redeploy de Mintlify. Desde otro dispositivo, abrí el sitio público, elegí la URL del túnel en el dropdown del playground, y dale Send → la request va por el túnel hasta tu Docker local.</p>
+
+  <div class="callout warn">
+    La URL del túnel temporal <strong>cambia cada vez</strong> que reinicies <code>cloudflared</code>. Para una URL fija, usá <code>cloudflared tunnel create &lt;nombre&gt;</code> (requiere cuenta de Cloudflare).
+  </div>
+</section>
+
+<hr />
+
+<section id="cierre">
+  <h2><span class="step-tag">CIERRE</span>Resultado y siguientes pasos</h2>
+
+  <p>Al terminar el taller, el alumno tiene:</p>
+  <ul>
+    <li>✅ Sitio Mintlify con páginas conceptuales + 2 endpoints (GET autores y GET libros)</li>
+    <li>✅ Playground interactivo conectado al Swagger real</li>
+    <li>✅ Dropdown con múltiples baseUrls en el playground</li>
+    <li>✅ Deploy continuo desde GitHub</li>
+    <li>✅ (Opcional) Playground público vía Cloudflare Tunnel</li>
+  </ul>
+
+  <h3>Próximos pasos sugeridos</h3>
+  <ul>
+    <li>Documentar GETs por ID, POST, PUT y DELETE siguiendo el mismo patrón del Paso 3</li>
+    <li>Añadir página de Relación Autor↔Libro</li>
+    <li>Añadir autenticación (Bearer) y reflejarla en el spec</li>
+    <li>Migrar a <code>docs.json</code> (formato nuevo de Mintlify)</li>
+  </ul>
+</section>
+
+</main>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markdown.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-diff.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+
+<script>
+  document.querySelectorAll(".copy-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const codeEl = btn.closest(".code-block").querySelector("pre code");
+      const raw = codeEl.textContent;
+      navigator.clipboard.writeText(raw).then(() => {
+        const original = btn.textContent;
+        btn.textContent = "Copiado!";
+        btn.classList.add("copied");
+        setTimeout(() => {
+          btn.textContent = original;
+          btn.classList.remove("copied");
+        }, 1500);
+      });
+    });
+  });
+
+  const sections = document.querySelectorAll("section[id]");
+  const navLinks = document.querySelectorAll("#toc a");
+  function updateActiveLink() {
+    const scrollPos = window.scrollY + 150;
+    let current = "";
+    sections.forEach((s) => {
+      if (s.offsetTop <= scrollPos) current = s.id;
+    });
+    navLinks.forEach((l) => {
+      l.classList.toggle("active", l.getAttribute("href") === "#" + current);
+    });
+  }
+  window.addEventListener("scroll", updateActiveLink);
+  updateActiveLink();
+</script>
+
+</body>
+</html>

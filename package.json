@@ -1,0 +1,30 @@
+{
+  "name": "practica",
+  "version": "1.0.0",
+  "description": "API REST de libreria con Node.js, Express, PostgreSQL y Docker",
+  "main": "src/index.js",
+  "scripts": {
+    "prestart": "node scripts/export-openapi.js",
+    "start": "node src/index.js",
+    "predev": "node scripts/export-openapi.js",
+    "dev": "nodemon src/index.js",
+    "docs:openapi": "node scripts/export-openapi.js",
+    "up": "node scripts/export-openapi.js && docker compose up --build",
+    "down": "docker compose down"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "pg": "^8.20.0",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.37.7",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}

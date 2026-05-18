@@ -1,0 +1,911 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Librería API",
+    "version": "1.0.0",
+    "description": "API REST para gestionar autores y libros usando Node.js, Express, Sequelize y PostgreSQL."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:4040",
+      "description": "Servidor API"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "AutorInput": {
+        "type": "object",
+        "required": [
+          "nombre"
+        ],
+        "properties": {
+          "nombre": {
+            "type": "string",
+            "example": "Gabriel Garcia Marquez"
+          },
+          "biografia": {
+            "type": "string",
+            "example": "Novelista y periodista colombiano."
+          }
+        }
+      },
+      "LibroInput": {
+        "type": "object",
+        "required": [
+          "titulo",
+          "isbn",
+          "genero",
+          "autor_id"
+        ],
+        "properties": {
+          "titulo": {
+            "type": "string",
+            "example": "Fundacion"
+          },
+          "isbn": {
+            "type": "string",
+            "example": "9780553293357"
+          },
+          "genero": {
+            "type": "string",
+            "example": "ciencia ficcion"
+          },
+          "anio_publicacion": {
+            "type": "integer",
+            "example": 1951
+          },
+          "autor_id": {
+            "type": "integer",
+            "example": 2
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/autores": {
+      "get": {
+        "tags": [
+          "Autores"
+        ],
+        "summary": "Listar autores",
+        "description": "Devuelve todos los autores registrados.",
+        "responses": {
+          "200": {
+            "description": "Lista de autores.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": [
+                    {
+                      "id": 1,
+                      "nombre": "Gabriel Garcia Marquez",
+                      "biografia": "Novelista y periodista colombiano.",
+                      "created_at": "2026-05-09T18:00:00.000Z"
+                    },
+                    {
+                      "id": 2,
+                      "nombre": "Isaac Asimov",
+                      "biografia": "Escritor y bioquimico, referente de la ciencia ficcion.",
+                      "created_at": "2026-05-09T18:00:00.000Z"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "error": {
+                    "code": "AUTORES_LIST_ERROR",
+                    "message": "Error al listar autores"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Autores"
+        ],
+        "summary": "Crear autor",
+        "description": "Crea un nuevo autor.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AutorInput"
+              },
+              "example": {
+                "nombre": "Ursula K. Le Guin",
+                "biografia": "Autora de ficcion especulativa y fantasia."
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Autor creado correctamente.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": 6,
+                    "nombre": "Ursula K. Le Guin",
+                    "biografia": "Autora de ficcion especulativa y fantasia.",
+                    "created_at": "2026-05-09T18:20:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Body invalido.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "error": {
+                    "code": "INVALID_BODY",
+                    "message": "El campo nombre es obligatorio"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "error": {
+                    "code": "AUTOR_CREATE_ERROR",
+                    "message": "Error al crear autor"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/autores/{id}": {
+      "get": {
+        "tags": [
+          "Autores"
+        ],
+        "summary": "Obtener autor por ID",
+        "description": "Devuelve el autor correspondiente al ID enviado.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Autor encontrado.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": 1,
+                    "nombre": "Gabriel Garcia Marquez",
+                    "biografia": "Novelista y periodista colombiano.",
+                    "created_at": "2026-05-09T18:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ID invalido.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "error": {
+                    "code": "INVALID_ID",
+                    "message": "ID de autor invalido"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Autor no encontrado.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "error": {
+                    "code": "AUTOR_NOT_FOUND",
+                    "message": "Autor no encontrado"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "error": {
+                    "code": "AUTOR_GET_ERROR",
+                    "message": "Error al consultar autor"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Autores"
+        ],
+        "summary": "Actualizar autor",
+        "description": "Actualiza un autor existente por ID.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AutorInput"
+              },
+              "example": {
+                "nombre": "Gabriel Garcia Marquez",
+                "biografia": "Autor de Cien anos de soledad."
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Autor actualizado.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": 1,
+                    "nombre": "Gabriel Garcia Marquez",
+                    "biografia": "Autor de Cien anos de soledad.",
+                    "created_at": "2026-05-09T18:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ID o body invalido.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "error": {
+                    "code": "INVALID_BODY",
+                    "message": "El campo nombre es obligatorio"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Autor no encontrado.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "error": {
+                    "code": "AUTOR_NOT_FOUND",
+                    "message": "Autor no encontrado"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "error": {
+                    "code": "AUTOR_UPDATE_ERROR",
+                    "message": "Error al actualizar autor"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Autores"
+        ],
+        "summary": "Eliminar autor",
+        "description": "Elimina un autor por ID.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "example": 5
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Autor eliminado.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "message": "Autor eliminado"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ID invalido o autor con libros asociados.",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "invalidId": {
+                    "value": {
+                      "success": false,
+                      "error": {
+                        "code": "INVALID_ID",
+                        "message": "ID de autor invalido"
+                      }
+                    }
+                  },
+                  "hasBooks": {
+                    "value": {
+                      "success": false,
+                      "error": {
+                        "code": "AUTOR_HAS_BOOKS",
+                        "message": "No se puede eliminar el autor porque tiene libros asociados"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Autor no encontrado.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "error": {
+                    "code": "AUTOR_NOT_FOUND",
+                    "message": "Autor no encontrado"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "error": {
+                    "code": "AUTOR_DELETE_ERROR",
+                    "message": "Error al eliminar autor"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/libros": {
+      "get": {
+        "tags": [
+          "Libros"
+        ],
+        "summary": "Listar libros",
+        "description": "Lista todos los libros o filtra por genero con query param.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "genero",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filtra por genero exacto (ej. ficcion, historia, tecnologia).",
+            "example": "ficcion"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de libros.",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "allBooks": {
+                    "value": {
+                      "success": true,
+                      "data": [
+                        {
+                          "id": 1,
+                          "titulo": "Cien anos de soledad",
+                          "isbn": "9780307474728",
+                          "genero": "ficcion",
+                          "anio_publicacion": 1967,
+                          "autor_id": 1,
+                          "created_at": "2026-05-09T18:00:00.000Z",
+                          "autor": {
+                            "id": 1,
+                            "nombre": "Gabriel Garcia Marquez"
+                          }
+                        },
+                        {
+                          "id": 3,
+                          "titulo": "Fundacion",
+                          "isbn": "9780553293357",
+                          "genero": "ciencia ficcion",
+                          "anio_publicacion": 1951,
+                          "autor_id": 2,
+                          "created_at": "2026-05-09T18:00:00.000Z",
+                          "autor": {
+                            "id": 2,
+                            "nombre": "Isaac Asimov"
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "byGenre": {
+                    "value": {
+                      "success": true,
+                      "data": [
+                        {
+                          "id": 1,
+                          "titulo": "Cien anos de soledad",
+                          "isbn": "9780307474728",
+                          "genero": "ficcion",
+                          "anio_publicacion": 1967,
+                          "autor_id": 1,
+                          "created_at": "2026-05-09T18:00:00.000Z",
+                          "autor": {
+                            "id": 1,
+                            "nombre": "Gabriel Garcia Marquez"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "error": {
+                    "code": "LIBROS_LIST_ERROR",
+                    "message": "Error al listar libros"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Libros"
+        ],
+        "summary": "Crear libro",
+        "description": "Crea un libro asociado a un autor.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LibroInput"
+              },
+              "example": {
+                "titulo": "Yo, robot",
+                "isbn": "9780553382563",
+                "genero": "ciencia ficcion",
+                "anio_publicacion": 1950,
+                "autor_id": 2
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Libro creado.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": 11,
+                    "titulo": "Yo, robot",
+                    "isbn": "9780553382563",
+                    "genero": "ciencia ficcion",
+                    "anio_publicacion": 1950,
+                    "autor_id": 2,
+                    "created_at": "2026-05-09T18:30:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Body invalido, autor no existente o ISBN duplicado.",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "invalidBody": {
+                    "value": {
+                      "success": false,
+                      "error": {
+                        "code": "INVALID_BODY",
+                        "message": "Los campos titulo, isbn, genero y autor_id son obligatorios"
+                      }
+                    }
+                  },
+                  "authorNotFound": {
+                    "value": {
+                      "success": false,
+                      "error": {
+                        "code": "AUTOR_NOT_FOUND",
+                        "message": "El autor_id no existe"
+                      }
+                    }
+                  },
+                  "isbnDuplicate": {
+                    "value": {
+                      "success": false,
+                      "error": {
+                        "code": "ISBN_DUPLICATE",
+                        "message": "El isbn ya existe"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "error": {
+                    "code": "LIBRO_CREATE_ERROR",
+                    "message": "Error al crear libro"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/libros/{id}": {
+      "get": {
+        "tags": [
+          "Libros"
+        ],
+        "summary": "Obtener libro por ID",
+        "description": "Devuelve un libro con datos del autor.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "example": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Libro encontrado.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": 3,
+                    "titulo": "Fundacion",
+                    "isbn": "9780553293357",
+                    "genero": "ciencia ficcion",
+                    "anio_publicacion": 1951,
+                    "autor_id": 2,
+                    "created_at": "2026-05-09T18:00:00.000Z",
+                    "autor": {
+                      "id": 2,
+                      "nombre": "Isaac Asimov"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ID invalido.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "error": {
+                    "code": "INVALID_ID",
+                    "message": "ID de libro invalido"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Libro no encontrado.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "error": {
+                    "code": "LIBRO_NOT_FOUND",
+                    "message": "Libro no encontrado"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "error": {
+                    "code": "LIBRO_GET_ERROR",
+                    "message": "Error al consultar libro"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Libros"
+        ],
+        "summary": "Actualizar libro",
+        "description": "Actualiza un libro por ID.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "example": 3
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LibroInput"
+              },
+              "example": {
+                "titulo": "Fundacion",
+                "isbn": "9780553293357",
+                "genero": "ciencia ficcion",
+                "anio_publicacion": 1951,
+                "autor_id": 2
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Libro actualizado.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "id": 3,
+                    "titulo": "Fundacion",
+                    "isbn": "9780553293357",
+                    "genero": "ciencia ficcion",
+                    "anio_publicacion": 1951,
+                    "autor_id": 2,
+                    "created_at": "2026-05-09T18:00:00.000Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ID/body invalido, autor no existente o ISBN duplicado.",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "invalidBody": {
+                    "value": {
+                      "success": false,
+                      "error": {
+                        "code": "INVALID_BODY",
+                        "message": "Los campos titulo, isbn, genero y autor_id son obligatorios"
+                      }
+                    }
+                  },
+                  "invalidId": {
+                    "value": {
+                      "success": false,
+                      "error": {
+                        "code": "INVALID_ID",
+                        "message": "ID de libro invalido"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Libro no encontrado.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "error": {
+                    "code": "LIBRO_NOT_FOUND",
+                    "message": "Libro no encontrado"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "error": {
+                    "code": "LIBRO_UPDATE_ERROR",
+                    "message": "Error al actualizar libro"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Libros"
+        ],
+        "summary": "Eliminar libro",
+        "description": "Elimina un libro por ID.",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "example": 10
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Libro eliminado.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": {
+                    "message": "Libro eliminado"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "ID invalido.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "error": {
+                    "code": "INVALID_ID",
+                    "message": "ID de libro invalido"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Libro no encontrado.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "error": {
+                    "code": "LIBRO_NOT_FOUND",
+                    "message": "Libro no encontrado"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor.",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "error": {
+                    "code": "LIBRO_DELETE_ERROR",
+                    "message": "Error al eliminar libro"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "tags": []
+}
