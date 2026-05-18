@@ -15,20 +15,14 @@
       "to": "#14B8A6"
     }
   },
-  "openapi": ["openapi.json"],
+  "openapi": "openapi.json",
   "api": {
     "baseUrl": [
       "http://localhost:4040",
       "https://placeholder.trycloudflare.com"
     ],
     "playground": {
-      "mode": "show",
-      "disableProxy": true
-    },
-    "request": {
-      "example": {
-        "languages": ["curl", "javascript", "python"]
-      }
+      "mode": "show"
     }
   },
   "topbarLinks": [
@@ -49,7 +43,6 @@
     {
       "group": "Inicio",
       "pages": [
-        "index",
         "introduction",
         "quickstart"
       ]
