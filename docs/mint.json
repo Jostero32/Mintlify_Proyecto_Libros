@@ -49,6 +49,7 @@
     {
       "group": "Inicio",
       "pages": [
+        "index",
         "introduction",
         "quickstart"
       ]
