@@ -149,10 +149,6 @@ include: [
 
 Por eso `GET /libros` y `GET /libros/{id}` devuelven un objeto anidado `autor: { id, nombre }` además de `autor_id`. Los endpoints `POST /libros` y `PUT /libros/{id}` **no** aplican este include, así que retornan solo el campo `autor_id` sin objeto anidado.
 
-<Tip>
-  La navegación práctica de la relación (cómo listar los libros de un autor desde el cliente) está documentada en [Relación Autor ↔ Libros](/api-reference/relacion).
-</Tip>
-
 ## Inicialización del esquema
 
 La API ejecuta `sequelize.sync({ alter: true })` al arrancar ([initDatabase](Practica_Con_Mintlify/src/config/database.js#L32)). Esto crea las tablas si no existen y ajusta columnas si cambiaron. No hay migraciones manuales.
