@@ -4,7 +4,7 @@ description: "Definición de los modelos Sequelize de la API: Autor, Libro y la 
 icon: "database"
 ---
 
-La capa de persistencia usa **Sequelize 6** sobre PostgreSQL 16. Los modelos viven en [src/models/](Practica_Con_Mintlify/src/models/) y se registran en [src/config/database.js](Practica_Con_Mintlify/src/config/database.js).
+La capa de persistencia usa **Sequelize 6** sobre PostgreSQL 16. Los modelos viven en [src/models/](https://github.com/jostero32/mintlify_proyecto_libros/blob/main/src/models/) y se registran en [src/config/database.js](https://github.com/jostero32/mintlify_proyecto_libros/blob/main/src/config/database.js).
 
 <Note>
   Ambos modelos tienen `timestamps: false` y exponen un único campo de fecha gestionado a mano: `created_at`. **No hay** `updated_at` ni `deleted_at`.
@@ -36,7 +36,7 @@ erDiagram
 
 ## Autor
 
-Definido en [src/models/autor.model.js](Practica_Con_Mintlify/src/models/autor.model.js). Tabla SQL: `autores`.
+Definido en [src/models/autor.model.js](https://github.com/jostero32/mintlify_proyecto_libros/blob/main/src/models/autor.model.js). Tabla SQL: `autores`.
 
 <ResponseField name="id" type="INTEGER (PK, autoincrement)" required>
   Identificador único. Generado por la base de datos.
@@ -65,7 +65,7 @@ Definido en [src/models/autor.model.js](Practica_Con_Mintlify/src/models/autor.m
 
 ## Libro
 
-Definido en [src/models/libro.model.js](Practica_Con_Mintlify/src/models/libro.model.js). Tabla SQL: `libros`.
+Definido en [src/models/libro.model.js](https://github.com/jostero32/mintlify_proyecto_libros/blob/main/src/models/libro.model.js). Tabla SQL: `libros`.
 
 <ResponseField name="id" type="INTEGER (PK, autoincrement)" required>
   Identificador único.
@@ -109,7 +109,7 @@ Definido en [src/models/libro.model.js](Practica_Con_Mintlify/src/models/libro.m
 
 ## Relación Autor ↔ Libro
 
-Definida en [src/config/database.js](Practica_Con_Mintlify/src/config/database.js):
+Definida en [src/config/database.js](https://github.com/jostero32/mintlify_proyecto_libros/blob/main/src/config/database.js):
 
 ```js
 Autor.hasMany(Libro, {
@@ -151,7 +151,7 @@ Por eso `GET /libros` y `GET /libros/{id}` devuelven un objeto anidado `autor: {
 
 ## Inicialización del esquema
 
-La API ejecuta `sequelize.sync({ alter: true })` al arrancar ([initDatabase](Practica_Con_Mintlify/src/config/database.js#L32)). Esto crea las tablas si no existen y ajusta columnas si cambiaron. No hay migraciones manuales.
+La API ejecuta `sequelize.sync({ alter: true })` al arrancar ([initDatabase](https://github.com/jostero32/mintlify_proyecto_libros/blob/main/src/config/database.js#L32)). Esto crea las tablas si no existen y ajusta columnas si cambiaron. No hay migraciones manuales.
 
 <Warning>
   `sync({ alter: true })` es cómodo para desarrollo pero no debe usarse así en producción — puede ejecutar `ALTER`s destructivos. Para producción, migrar a `sequelize-cli` o `umzug` con migraciones versionadas.
@@ -159,7 +159,7 @@ La API ejecuta `sequelize.sync({ alter: true })` al arrancar ([initDatabase](Pra
 
 ## Seeds
 
-Al arrancar, se ejecuta [src/config/seed.js](Practica_Con_Mintlify/src/config/seed.js) solo si las tablas están vacías. Carga un set inicial de autores y libros de prueba (Gabriel García Márquez, Isaac Asimov, etc.).
+Al arrancar, se ejecuta [src/config/seed.js](https://github.com/jostero32/mintlify_proyecto_libros/blob/main/src/config/seed.js) solo si las tablas están vacías. Carga un set inicial de autores y libros de prueba (Gabriel García Márquez, Isaac Asimov, etc.).
 
 Para forzar una reinicialización completa (incluido el reseed):
 

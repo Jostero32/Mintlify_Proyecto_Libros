@@ -4,7 +4,7 @@ description: "Cómo está estructurado el setup Docker del proyecto: servicios, 
 icon: "docker"
 ---
 
-El proyecto está empaquetado con **Docker Compose** y se levanta con un único comando. Esta página documenta la configuración real definida en [docker-compose.yml](Practica_Con_Mintlify/docker-compose.yml) y el [Dockerfile](Practica_Con_Mintlify/Dockerfile) de la API.
+El proyecto está empaquetado con **Docker Compose** y se levanta con un único comando. Esta página documenta la configuración real definida en [docker-compose.yml](https://github.com/jostero32/mintlify_proyecto_libros/blob/main/docker-compose.yml) y el [Dockerfile](https://github.com/jostero32/mintlify_proyecto_libros/blob/main/Dockerfile) de la API.
 
 ## Topología
 
@@ -103,8 +103,8 @@ Las variables se definen tanto en `docker-compose.yml` (valores efectivos en con
 
 | Variable      | Valor en Compose | Lectura en código                          | Descripción                                  |
 | ------------- | ---------------- | ------------------------------------------ | -------------------------------------------- |
-| `PORT`        | `4040`           | [src/index.js:37](Practica_Con_Mintlify/src/index.js#L37) | Puerto HTTP de Express.       |
-| `DB_HOST`     | `db`             | [src/config/database.js](Practica_Con_Mintlify/src/config/database.js) | Hostname del contenedor de Postgres dentro de la red Compose. |
+| `PORT`        | `4040`           | [src/index.js:37](https://github.com/jostero32/mintlify_proyecto_libros/blob/main/src/index.js#L37) | Puerto HTTP de Express.       |
+| `DB_HOST`     | `db`             | [src/config/database.js](https://github.com/jostero32/mintlify_proyecto_libros/blob/main/src/config/database.js) | Hostname del contenedor de Postgres dentro de la red Compose. |
 | `DB_PORT`     | `5432`           | idem                                       | Puerto interno de Postgres.                  |
 | `DB_USER`     | `postgres`       | idem                                       | Usuario.                                     |
 | `DB_PASSWORD` | `postgres`       | idem                                       | Contraseña.                                  |
@@ -208,7 +208,7 @@ Las variables se definen tanto en `docker-compose.yml` (valores efectivos en con
 
 ## Dockerfile de la API
 
-El [Dockerfile](Practica_Con_Mintlify/Dockerfile) es minimalista:
+El [Dockerfile](https://github.com/jostero32/mintlify_proyecto_libros/blob/main/Dockerfile) es minimalista:
 
 ```dockerfile
 FROM node:20-alpine
