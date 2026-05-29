@@ -1,0 +1,25 @@
+---
+title: "Changelog"
+description: "Novedades, mejoras y correcciones de la Librería API"
+---
+
+<Update label="2026-05-29" description="Lanzamiento inicial">
+
+## Nuevas funcionalidades
+
+- **API REST de Autores y Libros**. Operaciones CRUD completas sobre las entidades `Autor` y `Libro`, con relación 1:N entre autor y obras. Consulta los detalles en [API Reference](/api-reference/autores/list).
+- **Healthcheck público**. Nuevo endpoint `GET /health` para verificar el estado del servicio.
+- **Swagger UI interactivo**. Documentación navegable y ejecutable en `/api-docs`, con la especificación OpenAPI cruda disponible en `/api-docs.json`.
+- **Despliegue con Docker Compose**. Orquestación lista para usar con la API Node.js y PostgreSQL 16. Consulta la [guía de Docker](/docker) para levantar el entorno en un solo comando.
+- **Datos de ejemplo (seed)**. La base de datos se inicializa con autores y libros de muestra para acelerar las pruebas.
+
+## Mejoras
+
+- **Formato de respuesta consistente**. Todas las respuestas devuelven la estructura `{ success, data }` en éxito y `{ success, error: { code, message } }` en error. Más detalles en la [guía de errores](/errores).
+- **Modelos documentados**. Esquemas de `Autor` y `Libro` descritos en la [guía de modelos](/models), incluyendo validaciones y campos requeridos.
+
+## Cómo empezar
+
+Sigue la [Quickstart](/quickstart) para levantar la API en local en menos de cinco minutos.
+
+</Update>

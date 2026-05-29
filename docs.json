@@ -62,6 +62,12 @@
         "api-reference/autores/list",
         "api-reference/libros/list"
       ]
+    },
+    {
+      "group": "Novedades",
+      "pages": [
+        "changelog"
+      ]
     }
   ]
 }
